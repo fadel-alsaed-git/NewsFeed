@@ -5,16 +5,16 @@ Welcome to NewsFeed
 	- Change connectionStings in appseetings.json
 	- Run the App
 
--Application structure
+- Application structure:
 	- Domain layer:
-		* Entities (DB models)
-		* Filters (Helper class for filter)
-		* Repository 
-		* Contexts (DB,Dapper)
+		- Entities (DB models)
+		- Filters (Helper class for filter)
+		- Repository 
+		- Contexts (DB,Dapper)
 	- Appication layer:
-		* Services (Application logic and mapping)
-		* Profiles (For Auto Mapper)
-		* ViewModels (DTOs)
+		- Services (Application logic and mapping)
+		- Profiles (For Auto Mapper)
+		- ViewModels (DTOs)
 - NewsFeed APP:
 	- Contollers
 	- Views

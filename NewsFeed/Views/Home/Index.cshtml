@@ -1,0 +1,148 @@
+﻿@using Application.ViewModels;
+@model List<FeedDTO>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<link rel="stylesheet" href="/css/pagination.css">
+<script src="/js/pagination.js"></script>
+<link rel="stylesheet" href="/css/avnSkeleton.css">
+<script src="/js/avnPlugin.js"></script>
+<script src="/js/avnSkeleton.js"></script>
+
+<div class="text-center my-5">
+    <div class="input-group w-50 align-items-center">
+        <input type="text" class="form-control shadow-none search" placeholder="@_localization.Getkey("search")">
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary shadow-none searchBtn" type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                </svg>
+            </button>
+
+           
+        </div>
+
+        <partial name="_search.cshtml" />
+    </div>
+    <div id="pagination-demo"></div>
+
+    <div class="row row-cols-3 g-2 m-2 " id="feed">
+        @* <div class="col">
+            <div class="card">
+                <img src="https://mdbcdn.b-cdn.net/img/new/standard/city/041.webp" class="card-img-top" alt="Hollywood Sign on The Hill">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <p class="card-text">
+                        This is a longer card with supporting text below as a natural lead-in to
+                        additional content. This content is a little bit longer.
+                    </p>
+                </div>
+            </div>
+        </div> *@
+        <header></header>
+        <main></main>
+    </div>
+
+</div>
+<script>
+    var myPagination = new Pagination({
+        
+        container: $("#pagination-demo")
+    
+    });
+    var itemsCount = 100;
+    var itemsOnPage = 12;
+    var currentPage = 1;
+    var myPagination = new Pagination({
+        container: $("#pagination-demo"),
+        pageClickCallback: function (page) {
+            if (page !== currentPage) {
+                currentPage = page;
+                handelFilter()
+
+
+            }
+        },
+
+    });
+    $('#feed').avnSkeleton({
+
+        // default configs
+        cssPrefix: 'avn-skeleton',
+        header: {
+            selector: '> header',
+            lines: 2,
+            icon: true,
+            loader: true
+        },
+        main: {
+            selector: '> main',
+            paragraphs: 3,
+            lines: 4
+        }
+
+    });
+   let currentSearch = ''
+
+    $('#feed').avnSkeleton('display');
+
+    $('.searchBtn').click(function () {
+        debugger
+       const text =  $('.search').val()
+
+        if (text?.length > 0) { 
+            currentPage = 1
+            currentSearch = text
+            handelFilter()
+
+        }
+      
+    })
+
+
+    $('.clearBtn').click(function () {
+
+
+        if (currentSearch?.length > 0) {
+            currentPage = 1
+            currentSearch = ''
+            $('.search').val('')
+
+            handelFilter()
+
+        }
+
+    })
+    const handelFilter = () => {
+        $.ajax({
+            url: '@Url.Action("GetFeed")', data: { page: currentPage, perPage: itemsOnPage, searchQuery: currentSearch }, success: function (data) {
+                const result = data?.list
+                itemsCount = data?.count
+                $("#pagination-demo").empty()
+                myPagination.make(itemsCount, itemsOnPage, currentPage);
+                if (result) {
+                    $('#feed').avnSkeleton('remove');
+
+                    $('#feed').empty();
+                    for (let i = 0; i < result.length; i++) {
+                        //  $('#feed').append('   <div class="card"> <img src="" class="card-img-top" alt="Skyscrapers"><div class="card-body"><h5 class="card-title"></h5><p class="card-text"></p></div></div>')
+
+                        $('#feed').append(`  <div class="col"><a href="/Home/Details/${result[i].id}"class="card h-100 p-2" style="color: inherit;text-decoration: none;">
+                                <img src="${result[i].imageUrl}" class="card-img-top" alt="${result[i].title}"           loading="lazy">
+                <div class="card-body">
+                        <h5 class="card-title">${result[i].title} </h5>
+                    <p class="card-text">
+                              ${result[i].description}
+                    </p>
+                </div>
+               </a> </div>`)
+                    }
+                }
+            }
+        });
+    }
+
+    handelFilter()
+
+</script>
